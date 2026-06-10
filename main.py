@@ -1,5 +1,5 @@
 # AI 활용 자유 주제 파이썬 미니 프로젝트
-# 이름 또는 학번: 
+# 이름 또는 학번: 21005 김보배
 # 프로젝트 주제: 
 
 # ============================================================
@@ -24,78 +24,83 @@
 # 자신의 주제에 맞게 data를 만드세요.
 #
 # 현재 열의 의미:
-# 0번 열: 활동 이름
-# 1번 열: 필요한 시간(분)
-# 2번 열: 추천 기분
-# 3번 열: 활동 유형
+# 0번 열: 노래 제목
+# 1번 열: 가수 (그룹) 이름
+# 2번 열: 장르
+# 3번 열: '집중하기' 목적 점수
+# 4번 열: '분위기띄우기' 목적 점수
 # ------------------------------------------------------------
-
-activities = [
-    ["산책하기", 30, "피곤", "운동"],
-    ["짧은 낮잠", 20, "피곤", "휴식"],
-    ["좋아하는 음악 듣기", 10, "우울", "휴식"],
-    ["문제집 3쪽 풀기", 40, "차분", "공부"],
-    ["방 정리하기", 25, "답답", "생활"],
-    ["친구에게 연락하기", 15, "우울", "소통"],
+music_db = [
+    ['소문의 낙원', 'AKMU(악뮤)', '포크', 90, 30],
+    ["Dynamite", "BTS", "댄스", 30, 95],
+    ["밤양갱", "비비", "발라드", 80, 40],
+    ["Hype Boy", "NewJeans", "댄스", 40, 90],
+    ["에피소드", "이무진", "발라드", 85, 35],
+    ["시차", "우원재", "힙합", 50, 75]
 ]
-
-
 # ------------------------------------------------------------
 # 2. 함수 정의
 # ------------------------------------------------------------
 
-def show_intro():
-    """프로그램 제목과 안내를 출력한다."""
-    print("=" * 40)
-    print("AI 활용 자유 주제 파이썬 미니 프로젝트")
-    print("예시: 기분과 시간에 따른 활동 추천기")
-    print("=" * 40)
+def calculate_scores(db, user_genre, user_purpose):
+    scored_list = [] # 결과를 저장할 빈 리스트
+    
+    # 2차원 리스트를 반복문(for)으로 하나씩 순회합니다.
+    for music in db:
+        title = music[0]
+        artist = music[1]
+        genre = music[2]
+        study_score = music[3]   # 공부할 때 듣기 좋은 점수
+        sports_score = music[4]  # 운동할 때 듣기 좋은 점수
+        
+        score = 0 # 이 곡의 초기 추천 점수
+        
+        # [조건문 1] 사용자가 입력한 장르와 음악의 장르가 일치하는지 확인
+        if genre == user_genre:
+            score += 50  # 장르가 일치하면 기본 점수 50점 부여
+            
+        # [조건문 2] 사용자의 '목적'에 따른 가중치 부여
+        if user_purpose == "공부":
+            # 목적이 공부일 때는 '공부점수(study_score)'를 가중치로 더해줍니다.
+            score += study_score
+        elif user_purpose == "운동":
+            # 목적이 운동일 때는 '운동점수(sports_score)'를 가중치로 더해줍니다.
+            #### 여기에 운동 목적일 때 점수를 더하는 코드를 직접 채워보세요 ####
+            pass
+            
+        # 곡 정보와 최종 계산된 점수를 새 리스트에 담습니다.
+        scored_list.append([title, artist, score])
+        
+    return scored_list
 
-
-def get_user_input():
-    """사용자에게 기분과 남은 시간을 입력받는다."""
-    mood = input("현재 기분을 입력하세요. 예: 피곤, 우울, 차분, 답답: ")
-    minutes = int(input("사용 가능한 시간을 분 단위로 입력하세요: "))
-    return mood, minutes
-
-
-def find_recommendations(data, mood, minutes):
-    """2차원 리스트를 반복하며 조건에 맞는 활동을 찾는다."""
-    results = []
-
-    for row in data:
-        name = row[0]
-        required_minutes = row[1]
-        recommended_mood = row[2]
-        activity_type = row[3]
-
-        # 조건문: 사용자의 기분과 시간이 활동 조건에 맞는지 판단한다.
-        if recommended_mood == mood and required_minutes <= minutes:
-            results.append([name, required_minutes, activity_type])
-
-    return results
-
-
-def print_result(results):
-    """추천 결과를 출력한다."""
-    print("\n[추천 결과]")
-
-    if len(results) == 0:
-        print("조건에 맞는 활동이 없습니다.")
-        print("시간을 늘리거나 다른 기분을 입력해 보세요.")
-    else:
-        for item in results:
-            print(f"- {item[0]} / {item[1]}분 / 유형: {item[2]}")
-
+def sort_and_print(scored_list):
+    # 최종 추천 점수(인덱스 2번)를 기준으로 내림차순 정렬
+    scored_list.sort(key=lambda x: x[2], reverse=True)
+    
+    print("\n🎧 [추천 결과] 맞춤형 음악 TOP 3")
+    # 상위 3개 곡만 반복문으로 출력
+    for i in range(min(3, len(scored_list))):
+        print(f"{i+1}위: {scored_list[i][0]} - {scored_list[i][1]} (추천 점수: {scored_list[i][2]}점)")
 
 def main():
-    show_intro()
-    mood, minutes = get_user_input()
-    results = find_recommendations(activities, mood, minutes)
-    print_result(results)
+    print("🎵 사용자 맞춤형 음악 추천 시스템 시작 🎵")
+    
+    # 1. 입력 받기 (닉네임, 장르, 목적)
+    nickname = input("닉네임을 입력하세요: ")
+    user_genre = input("선호하는 장르를 입력하세요 (댄스/발라드/힙합/포크): ")
+    user_purpose = input("음악을 들으려는 목적을 입력하세요 (공부/운동): ")
+    
+    print(f"\n[확인] {nickname}님은 현재 [{user_purpose}] 목적으로 들을 [{user_genre}] 음악을 찾고 계시군요!")
+    
+    # 2. 처리 (점수 계산)
+    final_scores = calculate_scores(music_db, user_genre, user_purpose)
+    
+    # 3. 출력 (정렬 및 화면 표시)
+    sort_and_print(final_scores)
 
+if __name__ == "__main__":
+    main()
 
 # ------------------------------------------------------------
 # 3. 프로그램 실행
 # ------------------------------------------------------------
-main()
