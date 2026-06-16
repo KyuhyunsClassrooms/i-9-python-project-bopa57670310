@@ -1,7 +1,3 @@
-# AI 활용 자유 주제 파이썬 미니 프로젝트
-# 이름 또는 학번: 21005 김보배
-# 프로젝트 주제: 
-
 # ============================================================
 # 사용 안내
 # ------------------------------------------------------------
@@ -20,9 +16,6 @@
 # ------------------------------------------------------------
 # 1. 데이터 준비: 2차원 리스트
 # ------------------------------------------------------------
-# 아래 예시는 "활동 추천 프로그램"입니다.
-# 자신의 주제에 맞게 data를 만드세요.
-#
 # 현재 열의 의미:
 # 0번 열: 노래 제목
 # 1번 열: 가수 (그룹) 이름
@@ -33,74 +26,83 @@
 music_db = [
     ['소문의 낙원', 'AKMU(악뮤)', '포크', 90, 30],
     ["Dynamite", "BTS", "댄스", 30, 95],
-    ["밤양갱", "비비", "발라드", 80, 40],
+    ["밤양갱", "비비", "발라드", 70, 30],
     ["Hype Boy", "NewJeans", "댄스", 40, 90],
-    ["에피소드", "이무진", "발라드", 85, 35],
-    ["시차", "우원재", "힙합", 50, 75]
+    ["에피소드", "이무진", "발라드", 85, 40],
+    ["시차", "우원재", "힙합", 20, 75],
+    ["Super Shy", "NewJeans", "댄스", 45, 95], 
+    ["봄날", "BTS", "발라드", 80, 35],    
+    ["주저하는 연인들을 위해", "잔나비", "포크", 85, 25],
+    ["아로하", "조정석", "발라드", 65, 50],
+    ["쉬어", "아넌딜라이트", "힙합", 30, 85],
+    ["Love Lee", "AKMU(악뮤)", "포크", 60, 80]
 ]
 # ------------------------------------------------------------
 # 2. 함수 정의
 # ------------------------------------------------------------
 
-def calculate_scores(db, user_genre, user_purpose):
-    scored_list = [] # 결과를 저장할 빈 리스트
+def calculate_scores(db, user_genre, user_purpose, genre_weight, purpose_weight):
+    scored_list = []
     
-    # 2차원 리스트를 반복문(for)으로 하나씩 순회합니다.
     for music in db:
         title = music[0]
         artist = music[1]
         genre = music[2]
-        study_score = music[3]   # 공부할 때 듣기 좋은 점수
-        sports_score = music[4]  # 운동할 때 듣기 좋은 점수
+        study_score = music[3]   
+        sports_score = music[4] 
         
-        score = 0 # 이 곡의 초기 추천 점수
-        
-        # [조건문 1] 사용자가 입력한 장르와 음악의 장르가 일치하는지 확인
+        genre_score = 0
         if genre == user_genre:
-            score += 50  # 장르가 일치하면 기본 점수 50점 부여
+            genre_score = 100
             
-        # [조건문 2] 사용자의 '목적'에 따른 가중치 부여
-        if user_purpose == "공부":
-            # 목적이 공부일 때는 '공부점수(study_score)'를 가중치로 더해줍니다.
-            score += study_score
-        elif user_purpose == "운동":
-            # 목적이 운동일 때는 '운동점수(sports_score)'를 가중치로 더해줍니다.
-            #### 여기에 운동 목적일 때 점수를 더하는 코드를 직접 채워보세요 ####
-            pass
+        purpose_score = 0
+        if user_purpose == "집중하기":
+            purpose_score = study_score
+        elif user_purpose == "분위기띄우기":
+            purpose_score = sports_score
             
-        # 곡 정보와 최종 계산된 점수를 새 리스트에 담습니다.
-        scored_list.append([title, artist, score])
+
+        score = (genre_score * genre_weight) + (purpose_score * purpose_weight)
+        
+        score = round(score, 1)
+        if score > 0:
+            scored_list.append([title, artist, score])
         
     return scored_list
 
 def sort_and_print(scored_list):
-    # 최종 추천 점수(인덱스 2번)를 기준으로 내림차순 정렬
     scored_list.sort(key=lambda x: x[2], reverse=True)
     
-    print("\n🎧 [추천 결과] 맞춤형 음악 TOP 3")
-    # 상위 3개 곡만 반복문으로 출력
+    print("[추천 결과] 딱맞는 음악 TOP 3")
     for i in range(min(3, len(scored_list))):
         print(f"{i+1}위: {scored_list[i][0]} - {scored_list[i][1]} (추천 점수: {scored_list[i][2]}점)")
+        
+    if len(scored_list) == 0:
+        print("조건에 맞는 추천 음악이 없습니다. 입력값을 다르게 하여 다시 시도해 보세요!")
 
 def main():
-    print("🎵 사용자 맞춤형 음악 추천 시스템 시작 🎵")
+    print("음악 추천해 드립니다!")
     
-    # 1. 입력 받기 (닉네임, 장르, 목적)
     nickname = input("닉네임을 입력하세요: ")
     user_genre = input("선호하는 장르를 입력하세요 (댄스/발라드/힙합/포크): ")
-    user_purpose = input("음악을 들으려는 목적을 입력하세요 (공부/운동): ")
+    user_purpose = input("음악을 들으려는 목적을 입력하세요 (집중하기/분위기띄우기): ")
     
+    raw_weights = input("장르와 목적의 중요도 백분율을 공백으로 구분해 입력하세요 (예: 60 40): ").split()
+    
+    genre_weight = int(raw_weights[0]) / 100.0
+    purpose_weight = int(raw_weights[1]) / 100.0
+
     print(f"\n[확인] {nickname}님은 현재 [{user_purpose}] 목적으로 들을 [{user_genre}] 음악을 찾고 계시군요!")
     
-    # 2. 처리 (점수 계산)
-    final_scores = calculate_scores(music_db, user_genre, user_purpose)
+    final_scores = calculate_scores(music_db, user_genre, user_purpose, genre_weight, purpose_weight)
     
-    # 3. 출력 (정렬 및 화면 표시)
     sort_and_print(final_scores)
 
-if __name__ == "__main__":
-    main()
+
 
 # ------------------------------------------------------------
 # 3. 프로그램 실행
 # ------------------------------------------------------------
+
+main()
+
