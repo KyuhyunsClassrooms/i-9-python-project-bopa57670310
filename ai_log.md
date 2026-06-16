@@ -40,7 +40,7 @@ music_db 2차원 리스트에 다음과 같은 리스트 양식으로 노래를 
 - 반영 위치:  main.py의 sort_and_print 함수
 
 ---
-
+ 
 ## 3차 Gemini 활용
 
 - 사용 날짜: 06 / 16
